@@ -1,12 +1,22 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import AuthForm from '../../components/AuthForm';
+import apiService from '../../services/apiService.js';
 
 const RegisterPage: React.FC = () => {
-  const handleRegister = (data: any) => {
-    console.log('Register data:', data);
-    // Handle registration logic here
+  const navigate = useNavigate();
+
+  const handleRegister = async (data: any) => {
+    try {
+      const response = await apiService.post('users/register', data);
+      // console.log('Registration successful:', response);
+      navigate('/auth/verify-email');
+      // Optionally redirect or show success message
+    } catch (error: any) {
+      console.error('Registration failed:', error.message);
+      // Optionally show error message to user
+    }
   };
 
   return (

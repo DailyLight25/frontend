@@ -1,12 +1,22 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Added useNavigate
 import { Heart } from 'lucide-react';
 import AuthForm from '../../components/AuthForm';
+import apiService from '../../services/apiService'; // Import your apiService
 
 const LoginPage: React.FC = () => {
-  const handleLogin = (data: any) => {
-    console.log('Login data:', data);
-    // Handle login logic here
+  const navigate = useNavigate(); // Initialize navigate
+
+  const handleLogin = async (data: any) => {
+    try {
+      // Call your backend login endpoint
+      await apiService.post('users/token', data);
+      // On success, redirect to home
+      navigate('/dashboard');
+    } catch (error) {
+      // Handle error (show message, etc.)
+      console.error(error);
+    }
   };
 
   return (
@@ -26,7 +36,7 @@ const LoginPage: React.FC = () => {
         {/* Additional Links */}
         <div className="mt-6 text-center">
           <Link 
-            to="/" 
+            to="/home" 
             className="text-sm text-gray-500 hover:text-blue-800 transition-colors duration-200"
           >
             ← Back to Home
