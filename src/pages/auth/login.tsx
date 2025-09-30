@@ -8,16 +8,22 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate(); // Initialize navigate
 
   const handleLogin = async (data: any) => {
-    try {
-      // Call your backend login endpoint
-      await apiService.post('users/token', data);
-      // On success, redirect to home
-      navigate('/dashboard');
-    } catch (error) {
-      // Handle error (show message, etc.)
-      console.error(error);
-    }
-  };
+  try {
+    // Call your backend login endpoint
+    const response = await apiService.post('users/token/', data);
+
+    // Save tokens in localStorage (or cookies if you prefer)
+    localStorage.setItem("access_token", response.access);
+    localStorage.setItem("refresh_token", response.refresh);
+
+    // On success, redirect to dashboard
+    navigate('/home');
+  } catch (error: any) {
+    console.error("Login failed:", error);
+    alert("Invalid credentials or account not active.");
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center px-4 light-rays">
