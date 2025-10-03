@@ -4,12 +4,13 @@ import { Heart } from 'lucide-react';
 import AuthForm from '../../components/AuthForm';
 import apiService from '../../services/apiService.js';
 
+
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
 
   const handleRegister = async (data: any) => {
     try {
-      const response = await apiService.post('users/register', data);
+    await apiService.post('users/register', data);
       // console.log('Registration successful:', response);
       navigate('/auth/verify-email');
       // Optionally redirect or show success message

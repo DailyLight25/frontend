@@ -9,14 +9,11 @@ const Navbar: React.FC = () => {
 
   const navigate = useNavigate(); // Hook for redirecting after logout
 
-  // --- Links Setup ---
-  const publicLinks = [
+
+  const authenticatedLinks = [
     { name: 'Home', href: '/' },
     { name: 'About', href: '/#about' },
     { name: 'Features', href: '/#features' },
-  ];
-
-  const authenticatedLinks = [
     { name: 'Profile', href: '/profile' },
     { name: 'Dashboard', href: '/dashboard' },
     // Add any other user-only links here
@@ -90,7 +87,7 @@ const Navbar: React.FC = () => {
           */}
           <div className="hidden md:flex items-center space-x-8">
             {/* PUBLIC LINKS (Always Show) */}
-            {publicLinks.map((link) => (
+            {/* {publicLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
@@ -99,7 +96,7 @@ const Navbar: React.FC = () => {
                 {link.name}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-800 to-yellow-500 group-hover:w-full transition-all duration-300"></span>
               </a>
-            ))}
+            ))} */}
 
             {isAuthenticated ? (
               <>
@@ -155,7 +152,7 @@ const Navbar: React.FC = () => {
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 bg-white/95 backdrop-blur-md rounded-lg mt-2 shadow-lg border border-gray-100">
               {/* PUBLIC LINKS */}
-              {publicLinks.map((link) => (
+              {/* {publicLinks.map((link) => (
                 <a
                   key={link.name}
                   href={link.href}
@@ -164,7 +161,7 @@ const Navbar: React.FC = () => {
                 >
                   {link.name}
                 </a>
-              ))}
+              ))} */}
               
               {isAuthenticated ? (
                   <>
