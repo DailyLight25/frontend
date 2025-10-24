@@ -1,0 +1,28 @@
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+@import "tailwindcss";
+
+/* ─── FaithConnect Global Theme ─── */
+:root {
+  --background: transparent;
+  --foreground: #1A1A1A;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #1A1A1A;
+    --foreground: #F8F6F0;
+  }
+}
+
+/* ─── Base Body Styling ─── */
+body {
+  background-color: transparent;
+  color: var(--foreground);
+  font-family: 'Poppins', sans-serif;
+  overflow-x: hidden;
+}
+
+/* ─── Fix Divider Gaps ─── */
+svg {
+  display: block;
+}
