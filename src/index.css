@@ -19,6 +19,13 @@
 }
 
 @layer components {
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
   .btn-primary {
     @apply px-6 py-3 rounded-lg font-semibold text-white transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2;
     background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);

@@ -1,22 +1,67 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import AuthForm from '../../components/AuthForm';
-import apiService from '../../services/apiService.js';
-
+import { useAuth } from '../../contexts/AuthContext';
+import { useNotification } from '../../contexts/NotificationContext';
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
+  const { register } = useAuth();
+  const { showNotification } = useNotification();
+  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleRegister = async (data: any) => {
     try {
-    await apiService.post('users/register', data);
-      // console.log('Registration successful:', response);
-      navigate('/auth/verify-email');
-      // Optionally redirect or show success message
+      setIsLoading(true);
+      setFieldErrors({});
+      await register(data.username, data.email, data.password, data.confirmPassword);
+      
+      showNotification({
+        type: 'success',
+        title: 'Registration Successful',
+        message: 'Welcome to Salt & Light! Your account has been created and you are now logged in.',
+        duration: 4000
+      });
+      
+      // User is automatically logged in after registration
+      navigate('/home');
     } catch (error: any) {
       console.error('Registration failed:', error.message);
-      // Optionally show error message to user
+      
+      // Parse field-specific errors from the error message
+      const errorMessage = error.message || 'Registration failed. Please try again.';
+      
+      // Check if it's a field-specific error
+      if (errorMessage.includes('Username:') || errorMessage.includes('Email:') || 
+          errorMessage.includes('Password:') || errorMessage.includes('Confirm Password:')) {
+        const errors: { [key: string]: string } = {};
+        
+        if (errorMessage.includes('Username:')) {
+          errors.username = errorMessage.split('Username:')[1].split('.')[0].trim();
+        }
+        if (errorMessage.includes('Email:')) {
+          errors.email = errorMessage.split('Email:')[1].split('.')[0].trim();
+        }
+        if (errorMessage.includes('Password:')) {
+          errors.password = errorMessage.split('Password:')[1].split('.')[0].trim();
+        }
+        if (errorMessage.includes('Confirm Password:')) {
+          errors.confirmPassword = errorMessage.split('Confirm Password:')[1].split('.')[0].trim();
+        }
+        
+        setFieldErrors(errors);
+      } else {
+        showNotification({
+          type: 'error',
+          title: 'Registration Failed',
+          message: errorMessage,
+          duration: 5000
+        });
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -32,7 +77,7 @@ const RegisterPage: React.FC = () => {
           </div>
         </Link>
 
-        <AuthForm type="register" onSubmit={handleRegister} />
+        <AuthForm type="register" onSubmit={handleRegister} errors={fieldErrors} isLoading={isLoading} />
 
         {/* Additional Links */}
         <div className="mt-6 text-center">

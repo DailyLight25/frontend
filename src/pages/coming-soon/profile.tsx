@@ -13,9 +13,9 @@ const ProfileTab: React.FC = () => {
   const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
-    apiService.getCurrentUser().then((res: { data: User }) => {
-      setUser(res.data);
-      setFormData({ username: res.data.username, email: res.data.email });
+    apiService.getCurrentUser().then((res: User) => {
+      setUser(res);
+      setFormData({ username: res.username, email: res.email });
     });
   }, []);
 
@@ -25,7 +25,7 @@ const ProfileTab: React.FC = () => {
 
   const handleSave = async () => {
     const res = await apiService.patchCurrentUser(formData);
-    setUser(res.data);
+    setUser(res);
     setEditMode(false);
   };
 

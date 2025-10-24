@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import ProtectedRoute from "../components/ProtectedRoute";
+import { useAuth } from "../contexts/AuthContext";
 import apiService from "../services/apiService";
 
 // --- Interfaces ---
@@ -56,6 +58,8 @@ interface UserData {
 
 // --- Component ---
 const HomePage: React.FC = () => {
+  const { user: authUser } = useAuth();
+  
   // State
   const [user, setUser] = useState<UserData | null>(null);
   const [feed, setFeed] = useState<FeedPost[]>([]);
@@ -87,16 +91,17 @@ const HomePage: React.FC = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // Fetch user
-        const userData = await apiService.get("users/me/");
-        setUser({
-          displayName: userData.display_name || userData.username,
-          avatar: userData.avatar || "",
-          verified: userData.verified || false,
-          unreadNotifications: userData.unread_notifications || 0,
-          cached: true,
-          isAdmin: userData.is_admin || false,
-        });
+        // Use authenticated user data
+        if (authUser) {
+          setUser({
+            displayName: authUser.username,
+            avatar: authUser.profile_picture || "",
+            verified: authUser.is_verified,
+            unreadNotifications: 0, // TODO: Implement notifications
+            cached: true,
+            isAdmin: false, // TODO: Add admin field to user model
+          });
+        }
 
         // Fetch posts
         const postsRaw = await apiService.get("posts/posts/");
@@ -128,12 +133,12 @@ const HomePage: React.FC = () => {
         }));
         setPrayerRequests(prayers);
       } catch (err) {
-        // Optionally handle error
+        console.error('Error fetching data:', err);
       }
       setLoading(false);
     };
     fetchData();
-  }, []);
+  }, [authUser]);
 
   // Handlers for quick actions
   const handleNewPost = async (e: React.FormEvent) => {
@@ -248,13 +253,14 @@ const HomePage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Navbar />
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <Navbar />
 
-      {/* Hero/Header */}
-      <section className="flex flex-col items-center justify-center py-16 px-4 bg-gradient-to-br from-yellow-100 to-blue-50">
-        <div className="max-w-3xl w-full text-center">
-          <div className="flex items-center space-x-3 justify-center">
+      {/* Welcome Header */}
+      <section className="pt-20 pb-6 px-4 bg-gradient-to-br from-yellow-100 to-blue-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center space-x-3">
             <img
               src={
                 user?.avatar ||
@@ -277,12 +283,6 @@ const HomePage: React.FC = () => {
                     // title="Verified User"
                   />
                 )}
-                <Link
-                  to="/profile"
-                  className="ml-2 text-xs text-blue-600 underline hover:text-blue-800"
-                >
-                  Edit profile
-                </Link>
               </div>
               <div className="flex items-center space-x-2 text-xs text-gray-500">
                 <Bell className="inline h-4 w-4" aria-label="Notifications" />
@@ -458,7 +458,7 @@ const HomePage: React.FC = () => {
       )}
 
       {/* Feed and Sidebar (as before, but using fetched data) */}
-      <main className="flex-1 flex flex-col md:flex-row max-w-6xl mx-auto w-full px-4 gap-8">
+      <main className="flex-1 flex flex-col md:flex-row max-w-6xl mx-auto w-full px-4 gap-8" style={{ minHeight: '80vh' }}>
         {/* Feed */}
         <section className="flex-1 py-4 order-2 md:order-1">
           <div className="flex items-center justify-between mb-4 border-b pb-2">
@@ -467,7 +467,11 @@ const HomePage: React.FC = () => {
           </div>
           <div className="space-y-4">
             {feed.length === 0 && (
-              <div className="text-gray-500">No posts yet.</div>
+              <div className="text-gray-500 text-center py-8">
+                <BookOpen className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                <p className="text-lg font-medium text-gray-400">No posts yet.</p>
+                <p className="text-sm text-gray-400 mt-2">Be the first to share your thoughts with the community!</p>
+              </div>
             )}
             {feed.map((post) => (
               <div
@@ -620,8 +624,9 @@ const HomePage: React.FC = () => {
         </div>
       </main>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </ProtectedRoute>
   );
 };
 

@@ -2,6 +2,9 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import ApiTest from "../components/ApiTest";
+import AuthTest from "../components/AuthTest";
+import NotificationTest from "../components/NotificationTest";
 
 const LandingPage: React.FC = () => {
   return (
@@ -93,6 +96,21 @@ const LandingPage: React.FC = () => {
             className="h-64 w-full object-cover rounded-lg shadow"
           />
         </div>
+      </section>
+
+      {/* API Connection Test */}
+      <section className="max-w-6xl mx-auto px-4 py-8">
+        <ApiTest />
+      </section>
+
+      {/* Authentication Test */}
+      <section className="max-w-6xl mx-auto px-4 py-8">
+        <AuthTest />
+      </section>
+
+      {/* Notification Test */}
+      <section className="max-w-6xl mx-auto px-4 py-8">
+        <NotificationTest />
       </section>
 
       {/* Quick Links */}

@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, Mail, Lock, User, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface AuthFormProps {
   type: 'login' | 'register' | 'reset';
   onSubmit: (data: any) => void;
+  errors?: { [key: string]: string };
+  isLoading?: boolean;
 }
 
-const AuthForm: React.FC<AuthFormProps> = ({ type, onSubmit }) => {
+const AuthForm: React.FC<AuthFormProps> = ({ type, onSubmit, errors = {}, isLoading = false }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -56,6 +58,19 @@ const AuthForm: React.FC<AuthFormProps> = ({ type, onSubmit }) => {
   };
 
   const getButtonText = () => {
+    if (isLoading) {
+      switch (type) {
+        case 'login':
+          return 'Signing you in...';
+        case 'register':
+          return 'Creating account...';
+        case 'reset':
+          return 'Sending reset link...';
+        default:
+          return 'Loading...';
+      }
+    }
+    
     switch (type) {
       case 'login':
         return 'Sign In';
@@ -80,7 +95,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type, onSubmit }) => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {(type === 'register' || type === 'login') && (
+        {type === 'register' && (
           <div className="relative">
             <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
@@ -89,24 +104,50 @@ const AuthForm: React.FC<AuthFormProps> = ({ type, onSubmit }) => {
               placeholder="Username"
               value={formData.username}
               onChange={handleChange}
-              className="input-field pl-10"
+              className={`input-field pl-10 ${errors.username ? 'border-red-500' : ''}`}
               required
             />
+            {errors.username && (
+              <p className="text-red-500 text-xs mt-1">{errors.username}</p>
+            )}
           </div>
         )}
 
-        <div className="relative">
-          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email address"
-            value={formData.email}
-            onChange={handleChange}
-            className="input-field pl-10"
-            required
-          />
-        </div>
+        {type === 'login' && (
+          <div className="relative">
+            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <input
+              type="text"
+              name="username"
+              placeholder="Username or Email"
+              value={formData.username}
+              onChange={handleChange}
+              className={`input-field pl-10 ${errors.username ? 'border-red-500' : ''}`}
+              required
+            />
+            {errors.username && (
+              <p className="text-red-500 text-xs mt-1">{errors.username}</p>
+            )}
+          </div>
+        )}
+
+        {type === 'register' && (
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <input
+              type="email"
+              name="email"
+              placeholder="Email address"
+              value={formData.email}
+              onChange={handleChange}
+              className={`input-field pl-10 ${errors.email ? 'border-red-500' : ''}`}
+              required
+            />
+            {errors.email && (
+              <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+            )}
+          </div>
+        )}
 
         {type !== 'reset' && (
           <div className="relative">
@@ -117,7 +158,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type, onSubmit }) => {
               placeholder="Password"
               value={formData.password}
               onChange={handleChange}
-              className="input-field pl-10 pr-10"
+              className={`input-field pl-10 pr-10 ${errors.password ? 'border-red-500' : ''}`}
               required
             />
             <button
@@ -127,6 +168,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ type, onSubmit }) => {
             >
               {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
+            {errors.password && (
+              <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+            )}
           </div>
         )}
 
@@ -139,7 +183,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ type, onSubmit }) => {
               placeholder="Confirm Password"
               value={formData.confirmPassword}
               onChange={handleChange}
-              className="input-field pl-10 pr-10"
+              className={`input-field pl-10 pr-10 ${errors.confirmPassword ? 'border-red-500' : ''}`}
               required
             />
             <button
@@ -149,6 +193,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ type, onSubmit }) => {
             >
               {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
+            {errors.confirmPassword && (
+              <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>
+            )}
           </div>
         )}
 
@@ -166,12 +213,17 @@ const AuthForm: React.FC<AuthFormProps> = ({ type, onSubmit }) => {
 
         <button
           type="submit"
+          disabled={isLoading}
           className={`w-full flex items-center justify-center space-x-2 ${
             type === 'register' ? 'btn-secondary' : 'btn-primary'
-          }`}
+          } ${isLoading ? 'opacity-75 cursor-not-allowed' : ''}`}
         >
+          {isLoading ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <ArrowRight className="h-5 w-5" />
+          )}
           <span>{getButtonText()}</span>
-          <ArrowRight className="h-5 w-5" />
         </button>
       </form>
 
