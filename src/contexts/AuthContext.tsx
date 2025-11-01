@@ -9,6 +9,8 @@ interface User {
   is_verified: boolean;
   date_joined: string;
   last_login?: string;
+  follower_count?: number;
+  following_count?: number;
 }
 
 interface AuthContextType {
