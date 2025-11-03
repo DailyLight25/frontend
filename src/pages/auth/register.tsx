@@ -46,11 +46,12 @@ const RegisterPage: React.FC = () => {
         type: "success",
         title: "Registration Successful",
         message:
-          "Welcome to DayLight! Your account has been created and you are now logged in.",
-        duration: 4000,
+          "A verification email has been sent. Please check your inbox to activate your account.",
+        duration: 5000,
       });
 
-      navigate("/home");
+      // Navigate to email verification page with email
+      navigate(`/auth/verify-email?email=${encodeURIComponent(data.email)}`);
     } catch (error: any) {
       console.error("Registration failed:", error.message);
 

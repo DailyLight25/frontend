@@ -105,6 +105,12 @@ const handleResponse = async <T>(
       throw new Error(fieldErrors.join(". "));
     }
 
+    if (errorData.error) {
+      const error = new Error(errorData.error);
+      (error as any).expired = errorData.expired;
+      throw error;
+    }
+
     if (errorData.detail) {
       throw new Error(errorData.detail);
     }
@@ -132,14 +138,42 @@ const fetchWithAuth = async <T>(endpoint: string, options: RequestOptions): Prom
   return handleResponse<T>(response, { url, options: { ...options, headers } });
 };
 
+const fetchPublic = async <T>(endpoint: string, options: RequestOptions): Promise<T> => {
+  const url = buildUrl(endpoint);
+  const headers: Record<string, string> = {
+    ...(options.headers ?? {}),
+  };
+
+  const response = await fetch(url, {
+    ...options,
+    headers,
+  });
+
+  return handleResponse<T>(response, { url, options: { ...options, headers } });
+};
+
 const apiService = {
   get: <T = any>(endpoint: string) =>
     fetchWithAuth<T>(endpoint, {
       method: "GET",
     }),
 
+  getPublic: <T = any>(endpoint: string) =>
+    fetchPublic<T>(endpoint, {
+      method: "GET",
+    }),
+
   post: <T = any>(endpoint: string, data: unknown) =>
     fetchWithAuth<T>(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data ?? {}),
+    }),
+
+  postPublic: <T = any>(endpoint: string, data: unknown) =>
+    fetchPublic<T>(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
