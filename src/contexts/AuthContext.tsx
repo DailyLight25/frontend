@@ -9,6 +9,8 @@ interface User {
   is_verified: boolean;
   date_joined: string;
   last_login?: string;
+  follower_count?: number;
+  following_count?: number;
 }
 
 interface AuthContextType {
@@ -107,8 +109,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         password,
         confirmPassword,
       });
-      // Auto-verified in development, automatically log in the user
-      await login(username, password);
+      // Do NOT auto-login here. The backend creates an inactive/unverified user
+      // and sends a verification email — attempting to log in immediately
+      // results in a 401 from the token endpoint. Let callers decide what to do
+      // (Register page currently navigates to the verify-email screen).
     } catch (error: any) {
       throw new Error(error.message || 'Registration failed');
     } finally {
