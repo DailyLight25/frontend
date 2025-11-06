@@ -21,13 +21,15 @@ const handleResponse = async (response) => {
             const refreshData = await refreshResponse.json();
             localStorage.setItem('access_token', refreshData.access);
             // Retry the original request with new token
-            const retryResponse = await fetch(response.url, {
+            const retryRequest = await fetch(response.url, {
               method: response.method,
               headers: {
                 ...getAuthHeader(),
                 'Content-Type': 'application/json',
               },
+               body: response.request?.body || null,
             });
+            const retryResponse = await fetch(retryRequest);
             return retryResponse.json();
           }
         } catch (refreshError) {

@@ -18,26 +18,29 @@ const RegisterPage: React.FC = () => {
       setFieldErrors({});
       await register(data.username, data.email, data.password, data.confirmPassword);
       
+      // ✅ Notify user to verify email
       showNotification({
         type: 'success',
         title: 'Registration Successful',
-        message: 'Welcome to Salt & Light! Your account has been created and you are now logged in.',
-        duration: 4000
+        message: 'Your account has been created! Please check your email and verify your account before logging in.',
+        duration: 5000
       });
-      
-      // User is automatically logged in after registration
-      navigate('/home');
+
+      // ✅ Redirect to login (not verify-email page)
+      navigate('/auth/login');
     } catch (error: any) {
       console.error('Registration failed:', error.message);
-      
-      // Parse field-specific errors from the error message
+
       const errorMessage = error.message || 'Registration failed. Please try again.';
-      
-      // Check if it's a field-specific error
-      if (errorMessage.includes('Username:') || errorMessage.includes('Email:') || 
-          errorMessage.includes('Password:') || errorMessage.includes('Confirm Password:')) {
+
+      if (
+        errorMessage.includes('Username:') ||
+        errorMessage.includes('Email:') ||
+        errorMessage.includes('Password:') ||
+        errorMessage.includes('Confirm Password:')
+      ) {
         const errors: { [key: string]: string } = {};
-        
+
         if (errorMessage.includes('Username:')) {
           errors.username = errorMessage.split('Username:')[1].split('.')[0].trim();
         }
@@ -50,7 +53,7 @@ const RegisterPage: React.FC = () => {
         if (errorMessage.includes('Confirm Password:')) {
           errors.confirmPassword = errorMessage.split('Confirm Password:')[1].split('.')[0].trim();
         }
-        
+
         setFieldErrors(errors);
       } else {
         showNotification({
@@ -77,16 +80,30 @@ const RegisterPage: React.FC = () => {
           </div>
         </Link>
 
-        <AuthForm type="register" onSubmit={handleRegister} errors={fieldErrors} isLoading={isLoading} />
+        <AuthForm
+          type="register"
+          onSubmit={handleRegister}
+          errors={fieldErrors}
+          isLoading={isLoading}
+        />
 
         {/* Additional Links */}
         <div className="mt-6 text-center">
-          <Link 
-            to="/" 
+          <Link
+            to="/auth/login"
             className="text-sm text-gray-500 hover:text-green-600 transition-colors duration-200"
           >
-            ← Back to Home
+            Already have an account? Log in
           </Link>
+
+          <div className="mt-2">
+            <Link
+              to="/"
+              className="text-sm text-gray-500 hover:text-green-600 transition-colors duration-200"
+            >
+              ← Back to Home
+            </Link>
+          </div>
         </div>
       </div>
     </div>
